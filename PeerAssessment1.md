@@ -10,6 +10,9 @@ output:
 ```r
 unzip("activity.zip")
 activ <- read.csv("activity.csv")
+```
+
+```r
 str(activ)
 ```
 
@@ -22,6 +25,21 @@ str(activ)
 
 ## What is mean total number of steps taken per day?
 
+```r
+cat("The **mean** total number of steps taken per day is:");
+```
+
+```
+## The **mean** total number of steps taken per day is:
+```
+
+```r
+    cat(mean(activ$steps, na.rm = TRUE))
+```
+
+```
+## 37.3826
+```
 
 
 ## What is the average daily activity pattern?

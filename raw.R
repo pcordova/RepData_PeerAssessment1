@@ -1,50 +1,44 @@
+library(dplyr)
+library(ggplot2)
 
 unzip("activity.zip")
 activ <- read.csv("activity.csv")
 str(activ)
 
-pasos <- tapply(activ$steps, activ$date, sum, na.rm = TRUE) |>
+pasosDia <- tapply(activ$steps, activ$date, sum, na.rm = TRUE) |>
                 cbind(unique(activ$date)) |>
                 as.data.frame()
 
-colnames(pasos) <- c("Steps", "Dates")
+colnames(pasosDia) <- c("Steps", "Dates")
 
-pasos <- mutate(pasos, Steps = as.integer(Steps)) |>
-                mutate(Dates = as.Date(Dates))
+pasosDia <- mutate(pasosDia, Steps = as.numeric(Steps), Dates = as.Date(Dates))
 
-ggplot(pasos) +
+ggplot(pasosDia) +
     aes(Dates, Steps) +
-    geom_bar(stat = "identity", colour = '#4f84c4', fill = '#4079bf') +
+    geom_bar(stat = "identity", colour = '#63ADCA', fill = '#337995') +
     labs(title = "Total number of steps taken each day",
          caption = "October-November 2012") +
-    theme(plot.title = element_text(size = 22, colour = '#19304d'),
+    theme(plot.title = element_text(size = 22, colour = '#092733'),
           plot.subtitle = element_text(size = 18),
           axis.text=element_text(size=10),
           axis.title=element_text(size=14))
 
-
-
 cat("- The **mean** of steps taken per day is:",
-    mean(pasos$Steps, na.rm = TRUE),
+    mean(tapply(activ$steps, activ$date, sum), na.rm = TRUE),
     "\n\n- And the **median** of steps taken per day is:",
-    median(pasos$Steps, na.rm = TRUE))
+    median(tapply(activ$steps, activ$date, sum), na.rm = TRUE))
 
-
-
-#Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
-#and the average number of steps taken, averaged across all days (y-axis)
+## Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
+## and the average number of steps taken, averaged across all days (y-axis)
 intvs <- tapply(activ$steps, activ$interval, mean, na.rm = TRUE) |>
                 cbind(unique(activ$interval)) |>
                 as.data.frame()
 
 colnames(intvs) <- c("Steps", "Intervals")
 
-intvs <- mutate(intvs, Steps = as.integer(Steps))# |>
-            # mutate(Dates = as.Date(Dates))
-
 ggplot(intvs) +
     aes(Intervals, Steps) +
-    geom_line(size = 1.2, colour = '#4079bf') +
+    geom_line(linewidth = 1.2, colour = '#4079bf') +
     labs(title = "Average steps per each 5-minute interval",
          caption = "October-November 2012") +
     theme(plot.title = element_text(size = 22, colour = '#19304d'),
@@ -55,21 +49,72 @@ ggplot(intvs) +
 cat("- The maximum number of recorded steps is:",
     max(intvs$Steps, na.rm = TRUE),
     "\n\n- And the interval containing that maximum value is:",
-    intvs$Intervals[intvs$Steps == max(intvs$Steps, na.rm = TRUE)])
+    intvs$Intervals[intvs$Steps == max(intvs$Steps, na.rm = TRUE)]
+)
+
+## Imputing missing values
+NAs <- is.na(activ$steps)
+qNAs <- length(activ$steps[NAs])
+
+cat("The total number of missing values in the dataset is:",
+    qNAs, paste0("(",scales::percent(qNAs/nrow(activ)),")")
+)
+
+activ2 <- activ
+
+for (i in c(1:nrow(activ2))) {
+    if(is.na(activ2$steps[i])) {
+        activ2$steps[i] <- intvs$Steps[intvs$Intervals==activ2$interval[i]]
+    }
+}
+
+pasos2 <- tapply(activ2$steps, activ2$date, sum) |>
+                cbind(unique(activ2$date)) |>
+                as.data.frame()
+
+colnames(pasos2) <- c("Steps", "Dates")
+
+pasos2 <- mutate(pasos2, Steps = as.numeric(Steps), Dates = as.Date(Dates))
+
+ggplot(pasos2) +
+    aes(Dates, Steps) +
+    geom_bar(stat = "identity", colour = '#63ADCA', fill = '#337995') +
+    labs(title = "Total number of steps taken each day",
+         caption = "October-November 2012") +
+    theme(plot.title = element_text(size = 22, colour = '#092733'),
+          plot.subtitle = element_text(size = 18),
+          axis.text=element_text(size=10),
+          axis.title=element_text(size=14))
+
+
+cat("- The **mean** of steps taken per day is:",
+    mean(pasos2$Steps),
+    "\n\n- And the **median** of steps taken per day is:",
+    median(pasos2$Steps))
 
 
 
 
 
-mean(activ$steps, na.rm = TRUE)
-activ <- mutate(activ, date = as.Date(date, format = "%Y-%m-%d"))
-unique(activ$date)
-days <- weekdays(as.Date(unique(activ$date)))
+
+          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+
+
+
+
+str(activ2)
 days <- weekdays(as.Date(activ$date))
-steps <- tapply(activ$steps, activ$date, sum, na.rm = TRUE)
-dates <- as.Date(unique(activ$date), format = "%Y-%m-%d")
+days61 <- weekdays(as.Date(unique(activ$date)))
+dates61 <- as.Date(unique(activ$date))
 
 
 
 
+
+# Paleta de colores:
+ #DDEDF3
+ #63ADCA
+ #337995
+ #193B48
+ #092733
 

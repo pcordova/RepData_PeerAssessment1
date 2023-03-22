@@ -87,13 +87,39 @@ ggplot(pasos2) +
           axis.title=element_text(size=14))
 
 
-cat("- The **mean** of steps taken per day is:",
+cat("- The **mean** of steps taken per day (imputed values) is:",
     mean(pasos2$Steps),
-    "\n\n- And the **median** of steps taken per day is:",
+    "\n\n- And the **median** of steps taken per day (imputed values) is:",
     median(pasos2$Steps))
 
 
 
+activ2 <- tapply(activ2$steps, activ2$interval, mean) |>
+                cbind(unique(activ2$interval), as.Date(unique(activ2$date))) |>
+                as.data.frame()
+
+
+activ2 <- mutate(activ2, date = as.Date(date))
+
+for (i in c(1:nrow(activ2))) {
+    if(weekdays(activ2$date[i]) %in% c("Saturday", "Sunday")) {
+        activ2$Days[i] <- "Weekend"
+    } else(activ2$Days[i] <- "Weekday")
+}
+
+activ3 <- aggregate(activ2$steps, by=list(activ2$interval, activ2$Days), FUN = mean)
+colnames(activ3) <- c("Intervals", "Days","Steps")
+
+ggplot(activ3) +
+    aes(Intervals, Steps) +
+    geom_line(linewidth = 1.2, colour = '#4079bf') +
+    labs(title = "Average steps per each 5-minute interval",
+         caption = "October-November 2012") +
+    theme(plot.title = element_text(size = 22, colour = '#19304d'),
+          plot.subtitle = element_text(size = 18),
+          axis.text=element_text(size=10),
+          axis.title=element_text(size=14)) +
+    facet_grid(rows = vars(Days))
 
 
 

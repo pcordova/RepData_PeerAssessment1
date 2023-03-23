@@ -23,9 +23,9 @@ ggplot(pasosDia) +
           axis.text=element_text(size=10),
           axis.title=element_text(size=14))
 
-cat("- The **mean** of steps taken per day is:",
+cat(" The mean of steps taken per day is:",
     mean(tapply(activ$steps, activ$date, sum), na.rm = TRUE),
-    "\n\n- And the **median** of steps taken per day is:",
+    "\n\n And the median of steps taken per day is:",
     median(tapply(activ$steps, activ$date, sum), na.rm = TRUE))
 
 ## Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
@@ -46,9 +46,9 @@ ggplot(intvs) +
           axis.text=element_text(size=10),
           axis.title=element_text(size=14))
 
-cat("- The maximum number of recorded steps is:",
+cat(" The maximum number of recorded steps is:",
     max(intvs$Steps, na.rm = TRUE),
-    "\n\n- And the interval containing that maximum value is:",
+    "\n\n And the interval containing that maximum value is:",
     intvs$Intervals[intvs$Steps == max(intvs$Steps, na.rm = TRUE)]
 )
 
@@ -67,6 +67,7 @@ for (i in c(1:nrow(activ2))) {
         activ2$steps[i] <- intvs$Steps[intvs$Intervals==activ2$interval[i]]
     }
 }
+rm(i)
 
 pasos2 <- tapply(activ2$steps, activ2$date, sum) |>
                 cbind(unique(activ2$date)) |>
@@ -79,7 +80,7 @@ pasos2 <- mutate(pasos2, Steps = as.numeric(Steps), Dates = as.Date(Dates))
 ggplot(pasos2) +
     aes(Dates, Steps) +
     geom_bar(stat = "identity", colour = '#63ADCA', fill = '#337995') +
-    labs(title = "Total number of steps taken each day",
+    labs(title = "Total number of steps taken each day (imputed values)",
          caption = "October-November 2012") +
     theme(plot.title = element_text(size = 22, colour = '#092733'),
           plot.subtitle = element_text(size = 18),
@@ -87,16 +88,16 @@ ggplot(pasos2) +
           axis.title=element_text(size=14))
 
 
-cat("- The **mean** of steps taken per day (imputed values) is:",
+cat("The mean of steps taken per day (imputed values) is:",
     mean(pasos2$Steps),
-    "\n\n- And the **median** of steps taken per day (imputed values) is:",
-    median(pasos2$Steps))
+    "\n\n And the median of steps taken per day (imputed values) is:",
+    median(pasos2$Steps)
+)
 
 
-
-activ2 <- tapply(activ2$steps, activ2$interval, mean) |>
-                cbind(unique(activ2$interval), as.Date(unique(activ2$date))) |>
-                as.data.frame()
+# activ2 <- tapply(activ2$steps, activ2$interval, mean) |>
+#                cbind(unique(activ2$interval), as.Date(unique(activ2$date))) |>
+#               as.data.frame()
 
 
 activ2 <- mutate(activ2, date = as.Date(date))
@@ -122,19 +123,13 @@ ggplot(activ3) +
     facet_grid(rows = vars(Days))
 
 
-
-          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-
-
+          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)
 
 
 str(activ2)
 days <- weekdays(as.Date(activ$date))
 days61 <- weekdays(as.Date(unique(activ$date)))
 dates61 <- as.Date(unique(activ$date))
-
-
-
 
 
 # Paleta de colores:

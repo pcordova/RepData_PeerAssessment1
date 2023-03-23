@@ -13,17 +13,46 @@ This assignment makes use of data from a personal activity monitoring device. Th
 
 First, we are going to load a couple of required libraries:
 
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 ```
 
 Now we will unzip the file, load it to a variable and take a look at its structure:
 
-```{r}
+
+```r
 unzip("activity.zip")
 activ <- read.csv("activity.csv")
 str(activ)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : chr  "2012-10-01" "2012-10-01" "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
   
 ## Mean total number of steps taken per day
@@ -33,7 +62,8 @@ str(activ)
 We are going to generate a file to be plotted (pasosDia)  
 **Missing values are ignored**
 
-```{r}
+
+```r
 pasosDia <- tapply(activ$steps, activ$date, sum, na.rm = TRUE) |>
                 cbind(unique(activ$date)) |>
                 as.data.frame()
@@ -43,7 +73,8 @@ pasosDia <- mutate(pasosDia, Steps = as.numeric(Steps), Dates = as.Date(Dates))
 
 Now we plot the previously generated file:
 
-```{r}
+
+```r
 ggplot(pasosDia) +
     aes(Dates, Steps) +
     geom_bar(stat = "identity", colour = '#63ADCA', fill = '#337995') +
@@ -54,13 +85,22 @@ ggplot(pasosDia) +
           axis.title=element_text(size=14))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 ##### 2. Want to know what the **mean** and **median** total number of steps taken per day
 
-```{r}
+
+```r
 cat("The mean of steps taken per day is:",
     mean(tapply(activ$steps, activ$date, sum), na.rm = TRUE),
     "\n\n And the median of steps taken per day is:",
     median(tapply(activ$steps, activ$date, sum), na.rm = TRUE))
+```
+
+```
+## The mean of steps taken per day is: 10766.19 
+## 
+##  And the median of steps taken per day is: 10765
 ```
   
 ## Average daily activity pattern
@@ -69,7 +109,8 @@ cat("The mean of steps taken per day is:",
 
 First, generate the file to be plotted:
 
-```{r}
+
+```r
 intvs <- tapply(activ$steps, activ$interval, mean, na.rm = TRUE) |>
                 cbind(unique(activ$interval)) |>
                 as.data.frame()
@@ -78,7 +119,8 @@ colnames(intvs) <- c("Steps", "Intervals")
 
 Now we plot:
 
-```{r}
+
+```r
 ggplot(intvs) +
     aes(Intervals, Steps) +
     geom_line(linewidth = 1.2, colour = '#4079bf') +
@@ -89,14 +131,23 @@ ggplot(intvs) +
           axis.title=element_text(size=14))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
 ##### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r}
+
+```r
 cat("The maximum average number of recorded steps is:",
     max(intvs$Steps, na.rm = TRUE),
     "\n\n And the interval containing that maximum value is:",
     intvs$Intervals[intvs$Steps == max(intvs$Steps, na.rm = TRUE)]
 )
+```
+
+```
+## The maximum average number of recorded steps is: 206.1698 
+## 
+##  And the interval containing that maximum value is: 835
 ```
   
 ## Imputing missing values
@@ -105,7 +156,8 @@ There are a number of days/intervals where there are missing values (coded as NA
 
 ##### 1. Total number of missing values in the dataset
 
-```{r}
+
+```r
 NAs <- is.na(activ$steps)
 qNAs <- length(activ$steps[NAs])
 
@@ -114,9 +166,14 @@ cat("The total number of missing values in the dataset is:",
 )
 ```
 
+```
+## The total number of missing values in the dataset is: 2304 (13%)
+```
+
 ##### 2. Create a new dataset with missing values replaced by the mean of the corresponding 5-minute intervals
 
-```{r}
+
+```r
 activ2 <- activ
 
 for (i in c(1:nrow(activ2))) {
@@ -138,7 +195,8 @@ pasos2 <- mutate(pasos2, Steps = as.numeric(Steps), Dates = as.Date(Dates))
 
 ##### 3. Histogram of the total number of steps taken each day, including the imputed values
 
-```{r}
+
+```r
 ggplot(pasos2) +
     aes(Dates, Steps) +
     geom_bar(stat = "identity", colour = '#63ADCA', fill = '#337995') +
@@ -149,14 +207,23 @@ ggplot(pasos2) +
           axis.title=element_text(size=14))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 ##### 4. Mean and median total number of steps taken per day, including the imputed values
 
-```{r}
+
+```r
 cat("The mean of steps taken per day (imputed values) is:",
     mean(pasos2$Steps),
     "\n\n And the median of steps taken per day (imputed values) is:",
     median(pasos2$Steps)
 )
+```
+
+```
+## The mean of steps taken per day (imputed values) is: 10766.19 
+## 
+##  And the median of steps taken per day (imputed values) is: 10766.19
 ```
 
 Means calculated with missing values and with imputed values are coincident. This result is consequence of the chosen strategy i.e. to replace the missing values with the mean of the corresponding intervals. So, this "local" means doesn't affect the "global" mean.
@@ -165,7 +232,8 @@ Means calculated with missing values and with imputed values are coincident. Thi
 
 ##### 1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day
 
-```{r}
+
+```r
 activ2 <- mutate(activ2, date = as.Date(date))
 
 for (i in c(1:nrow(activ2))) {
@@ -181,7 +249,8 @@ colnames(activ3) <- c("Intervals", "Days","Steps")
 
 ##### 2. Panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)
 
-```{r}
+
+```r
 ggplot(activ3) +
     aes(Intervals, Steps) +
     geom_line(linewidth = 1.2, colour = '#4079bf') +
@@ -192,3 +261,5 @@ ggplot(activ3) +
           axis.title=element_text(size=14)) +
     facet_grid(rows = vars(Days))
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
